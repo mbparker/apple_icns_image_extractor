@@ -1,4 +1,4 @@
-﻿namespace MediaWidget.Core.Models
+﻿namespace AppleIcnsImageExtractor.Models
 {
     public enum Endianess
     {

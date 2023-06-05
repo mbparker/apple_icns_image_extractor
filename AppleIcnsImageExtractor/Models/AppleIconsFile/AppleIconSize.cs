@@ -1,9 +1,5 @@
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+namespace AppleIcnsImageExtractor.Models.AppleIconsFile;
 
-namespace MediaWidget.Core.Models.AppleIconsFile;
-
-[JsonConverter(typeof(StringEnumConverter))]
 public enum AppleIconSize
 {
     Large,

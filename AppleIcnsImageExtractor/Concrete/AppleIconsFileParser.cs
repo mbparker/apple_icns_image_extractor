@@ -1,9 +1,9 @@
 using System.Text;
-using MediaWidget.Core.Abstract;
-using MediaWidget.Core.Models;
-using MediaWidget.Core.Models.AppleIconsFile;
+using AppleIcnsImageExtractor.Abstract;
+using AppleIcnsImageExtractor.Models;
+using AppleIcnsImageExtractor.Models.AppleIconsFile;
 
-namespace MediaWidget.Core.Concrete;
+namespace AppleIcnsImageExtractor.Concrete;
 
 public class AppleIconsFileParser : IAppleIconsFileParser
 {
@@ -50,8 +50,45 @@ public class AppleIconsFileParser : IAppleIconsFileParser
                         if (IsSupported(icon.IconType))
                         {
                             SetIconMetrics(icon);
-                            result.Add(icon);   
+                            if (icon.Format != AppleIconFormat.Unknown)
+                            {
+                                result.Add(icon);
+                            }
                         }
+                        else
+                        {
+                            Console.WriteLine($"Ignored (from TOC) {icon.IconType}");
+                        }
+                    }
+                }
+                else
+                {
+                    try
+                    {
+                        stream.Seek(-4, SeekOrigin.Current);
+                        do
+                        {
+                            var icon = new AppleIcon();
+                            icon.IconType = Encoding.ASCII.GetString(binaryStreamReader.ReadBytes(4));
+                            var iconLen = binaryStreamReader.ReadInt32(Endianess.BigEndian) - 8;
+                            icon.Data = binaryStreamReader.ReadBytes(iconLen);
+                            if (IsSupported(icon.IconType))
+                            {
+                                SetIconMetrics(icon);
+                                if (icon.Format != AppleIconFormat.Unknown)
+                                {
+                                    result.Add(icon);
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine($"Ignored {icon.IconType}");
+                            }
+                        } while (!binaryStreamReader.Eof);
+                    }
+                    catch (Exception)
+                    {
+                        //
                     }
                 }
             }
@@ -76,6 +113,7 @@ public class AppleIconsFileParser : IAppleIconsFileParser
             case "icsB":
             case "sb24":
             case "SB24":
+            case "it32":
                 return true;
             default:
                 return false;
@@ -133,6 +171,10 @@ public class AppleIconsFileParser : IAppleIconsFileParser
             case "SB24":
                 icon.Height = 48;
                 icon.Width = 48;
+                break;
+            case "it32":
+                icon.Height = 128;
+                icon.Width = 128;                
                 break;
         }
         

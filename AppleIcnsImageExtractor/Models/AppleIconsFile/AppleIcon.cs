@@ -1,4 +1,4 @@
-namespace MediaWidget.Core.Models.AppleIconsFile;
+namespace AppleIcnsImageExtractor.Models.AppleIconsFile;
 
 public class AppleIcon
 {

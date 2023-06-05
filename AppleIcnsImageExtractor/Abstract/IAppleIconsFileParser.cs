@@ -1,6 +1,6 @@
-using MediaWidget.Core.Models.AppleIconsFile;
+using AppleIcnsImageExtractor.Models.AppleIconsFile;
 
-namespace MediaWidget.Core.Abstract;
+namespace AppleIcnsImageExtractor.Abstract;
 
 public interface IAppleIconsFileParser
 {

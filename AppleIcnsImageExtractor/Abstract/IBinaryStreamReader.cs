@@ -1,6 +1,6 @@
-﻿using MediaWidget.Core.Models;
+﻿using AppleIcnsImageExtractor.Models;
 
-namespace MediaWidget.Core.Abstract
+namespace AppleIcnsImageExtractor.Abstract
 {
     public interface IBinaryStreamReader
     {

@@ -1,7 +1,7 @@
-﻿using MediaWidget.Core.Abstract;
-using MediaWidget.Core.Models;
+﻿using AppleIcnsImageExtractor.Abstract;
+using AppleIcnsImageExtractor.Models;
 
-namespace MediaWidget.Core.Concrete
+namespace AppleIcnsImageExtractor.Concrete
 {
     using System;
     using System.IO;

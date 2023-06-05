@@ -1,6 +1,6 @@
 using System.Collections;
 
-namespace MediaWidget.Core.Models.AppleIconsFile;
+namespace AppleIcnsImageExtractor.Models.AppleIconsFile;
 
 public class AppleIconsCollection : IEnumerable<AppleIcon>
 {

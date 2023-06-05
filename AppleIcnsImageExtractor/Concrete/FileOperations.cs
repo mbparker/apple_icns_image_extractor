@@ -1,18 +1,9 @@
-﻿using System.Net;
-using System.Xml;
-using MediaWidget.Core.Abstract;
+﻿using AppleIcnsImageExtractor.Abstract;
 
-namespace MediaWidget.Core.Concrete
+namespace AppleIcnsImageExtractor.Concrete
 {
     public class FileOperations : IFileOperations
     {
-        private readonly Func<NetworkCredential, string, IUncPathAuthenticator> pathAuthenticatorFactory;
-
-        public FileOperations(Func<NetworkCredential, string, IUncPathAuthenticator> pathAuthenticatorFactory)
-        {
-            this.pathAuthenticatorFactory = pathAuthenticatorFactory;
-        }
-
         public void ClearAttributesOfFilesInDirectory(string path, bool recurse)
         {
             var searchOption = SearchOption.TopDirectoryOnly;
@@ -82,14 +73,6 @@ namespace MediaWidget.Core.Concrete
         public string CreateTempDirectory()
         {
             return CreateTempDirectory(GetTempPath());
-        }
-
-        public string CreateTempDirectory(NetworkCredential credential, string parentDirectory)
-        {
-            using (AcquireNetworkAccess(parentDirectory, credential))
-            {
-                return CreateTempDirectory(parentDirectory);
-            }
         }
 
         public string CreateTempFile()
@@ -184,14 +167,6 @@ namespace MediaWidget.Core.Concrete
             return Directory.GetFiles(path, filter, option);
         }
 
-        public string[] GetFiles(NetworkCredential credential, string path, string filter = "*", bool recurse = false)
-        {
-            using (AcquireNetworkAccess(path, credential))
-            {
-                return GetFiles(path, filter, recurse);
-            }
-        }
-
         public ulong GetFileSize(string filename)
         {
             var fileInfo = new FileInfo(filename);
@@ -253,31 +228,6 @@ namespace MediaWidget.Core.Concrete
                 fileShare);
         }
 
-        public XmlDocument OpenXmlDocument(string filename)
-        {
-            var document = new XmlDocument();
-            document.Load(filename);
-            return document;
-        }
-
-        public XmlDocument OpenXmlDocument(string filename, NetworkCredential credential)
-        {
-            using (AcquireNetworkAccess(Path.GetDirectoryName(filename), credential))
-            {
-                return OpenXmlDocument(filename);
-            }
-        }
-
-        public IXmlDocumentWithDefaultNamespace OpenXmlDocumentWithDefaultNamespace(
-            string filename,
-            string defaultNamespace,
-            string defaultNamespaceUri)
-        {
-            var document = new XmlDocumentWithDefaultNamespace(defaultNamespace, defaultNamespaceUri);
-            document.Load(filename);
-            return document;
-        }
-
         public void RemoveReadOnlyAttributeFromFile(string filename)
         {
             if (File.Exists(filename))
@@ -323,11 +273,9 @@ namespace MediaWidget.Core.Concrete
             File.WriteAllText(filename, text);
         }
 
-        private IUncPathAuthenticator AcquireNetworkAccess(string path, NetworkCredential credential)
+        public byte[] ReadAllBytes(string filename)
         {
-            var authenticator = pathAuthenticatorFactory(credential, path);
-            authenticator.AcquireAccess();
-            return authenticator;
+            return File.ReadAllBytes(filename);
         }
     }
 }

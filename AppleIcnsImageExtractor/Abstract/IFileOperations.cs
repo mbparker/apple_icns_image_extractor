@@ -1,7 +1,4 @@
-using System.Net;
-using System.Xml;
-
-namespace MediaWidget.Core.Abstract;
+namespace AppleIcnsImageExtractor.Abstract;
 
 public interface IFileOperations
 {
@@ -16,8 +13,6 @@ public interface IFileOperations
     string CreateTempDirectory();
 
     string CreateTempDirectory(string parentDirectory);
-
-    string CreateTempDirectory(NetworkCredential credential, string parentDirectory);
 
     string CreateTempFile();
 
@@ -45,8 +40,6 @@ public interface IFileOperations
 
     string[] GetFiles(string path, string filter = "*", bool recurse = false);
 
-    string[] GetFiles(NetworkCredential credential, string path, string filter = "*", bool recurse = false);
-
     ulong GetFileSize(string filename);
 
     string GetRelativePath(string pathFrom, string pathTo);
@@ -59,15 +52,6 @@ public interface IFileOperations
 
     Stream OpenFile(string filename, FileMode fileMode, FileShare fileShare = FileShare.Read);
 
-    XmlDocument OpenXmlDocument(string filename);
-
-    XmlDocument OpenXmlDocument(string filename, NetworkCredential credential);
-
-    IXmlDocumentWithDefaultNamespace OpenXmlDocumentWithDefaultNamespace(
-        string filename,
-        string defaultNamespace,
-        string defaultNamespaceUri);
-
     void RemoveReadOnlyAttributeFromFile(string filename);
 
     void SetCreatedTimestamp(string filename, DateTime timestamp);
@@ -79,4 +63,6 @@ public interface IFileOperations
     void WriteAllBytesToFile(string filename, byte[] data);
     
     void WriteAllTextToFile(string filename, string text);
+
+    byte[] ReadAllBytes(string filename);
 }
