@@ -8,7 +8,7 @@ namespace AppleIcnsImageExtractor.Concrete;
 public class AppleIconsFileParser : IAppleIconsFileParser
 {
     private readonly IBinaryStreamReader binaryStreamReader;
-    
+
     public AppleIconsFileParser(IBinaryStreamReader binaryStreamReader)
     {
         this.binaryStreamReader = binaryStreamReader;
@@ -63,33 +63,26 @@ public class AppleIconsFileParser : IAppleIconsFileParser
                 }
                 else
                 {
-                    try
+                    stream.Seek(-4, SeekOrigin.Current);
+                    do
                     {
-                        stream.Seek(-4, SeekOrigin.Current);
-                        do
+                        var icon = new AppleIcon();
+                        icon.IconType = Encoding.ASCII.GetString(binaryStreamReader.ReadBytes(4));
+                        var iconLen = binaryStreamReader.ReadInt32(Endianess.BigEndian) - 8;
+                        icon.Data = binaryStreamReader.ReadBytes(iconLen);
+                        if (IsSupported(icon.IconType))
                         {
-                            var icon = new AppleIcon();
-                            icon.IconType = Encoding.ASCII.GetString(binaryStreamReader.ReadBytes(4));
-                            var iconLen = binaryStreamReader.ReadInt32(Endianess.BigEndian) - 8;
-                            icon.Data = binaryStreamReader.ReadBytes(iconLen);
-                            if (IsSupported(icon.IconType))
+                            SetIconMetrics(icon);
+                            if (icon.Format != AppleIconFormat.Unknown)
                             {
-                                SetIconMetrics(icon);
-                                if (icon.Format != AppleIconFormat.Unknown)
-                                {
-                                    result.Add(icon);
-                                }
+                                result.Add(icon);
                             }
-                            else
-                            {
-                                Console.WriteLine($"Ignored {icon.IconType}");
-                            }
-                        } while (!binaryStreamReader.Eof);
-                    }
-                    catch (Exception)
-                    {
-                        //
-                    }
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Ignored {icon.IconType}");
+                        }
+                    } while (!binaryStreamReader.Eof);
                 }
             }
         }

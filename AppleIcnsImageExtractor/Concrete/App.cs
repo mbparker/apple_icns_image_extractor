@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using AppleIcnsImageExtractor.Abstract;
 using AppleIcnsImageExtractor.Models.AppleIconsFile;
 
@@ -7,11 +8,13 @@ public class App : IApp
 {
     private readonly IFileOperations fileOperations;
     private readonly IAppleIconsFileParser parser;
+    private readonly Func<IExternalProcessRunner> processFactory;
     
-    public App(IFileOperations fileOperations, IAppleIconsFileParser parser)
+    public App(IFileOperations fileOperations, IAppleIconsFileParser parser, Func<IExternalProcessRunner> processFactory)
     {
         this.fileOperations = fileOperations;
         this.parser = parser;
+        this.processFactory = processFactory;
     }
     
     public int Execute(string[] args)
@@ -42,6 +45,7 @@ public class App : IApp
         var sourceFiles = fileOperations.GetFiles(sourceDir, "*.icns", true).OrderByDescending(x => x).ToArray();
         if (sourceFiles.Any())
         {
+            fileOperations.CreateDirectory(outputDir);
             int fileCtr = 0;
             int totalImgCtr = 0;
             int errCtr = 0;
@@ -57,7 +61,6 @@ public class App : IApp
                     if (icns.Any())
                     {
                         int imgCtr = 0;
-                        fileOperations.EnsurePathExists(outputDir);
                         foreach (var icn in icns)
                         {
                             if (icn.Format != AppleIconFormat.Unknown)
@@ -93,6 +96,14 @@ public class App : IApp
                     {
                         Console.WriteLine(new string('-', 80));
                         Console.WriteLine($"No compatible images in: {sourceFile}");
+                        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                        {
+                            Console.WriteLine("[macOS] Falling back to SIPS");
+                            var proc = processFactory();
+                            var outputFilename = Path.Combine(outputDir, Path.GetFileNameWithoutExtension(sourceFile) + ".png");
+                            proc.Execute("sips", $"-s format png \"{sourceFile}\" --out \"{outputFilename}\"",
+                                CancellationToken.None);
+                        }
                     }
                 }
                 catch (Exception ex)

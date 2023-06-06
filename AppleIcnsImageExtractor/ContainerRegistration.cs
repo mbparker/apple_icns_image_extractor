@@ -12,6 +12,7 @@ public static class ContainerRegistration
         builder.RegisterType<App>().As<IApp>().SingleInstance();
         builder.RegisterType<AppleIconsFileParser>().As<IAppleIconsFileParser>().SingleInstance();
         builder.RegisterType<BinaryStreamReader>().As<IBinaryStreamReader>().InstancePerDependency();
+        builder.RegisterType<ExternalProcessRunner>().As<IExternalProcessRunner>().InstancePerDependency();
         builder.RegisterType<FileOperations>().As<IFileOperations>().SingleInstance();
         return builder.Build();
     }
